@@ -35,6 +35,16 @@ func (apiCfg *apiConfig) handleCreateFeed(w http.ResponseWriter, r *http.Request
 	}
 }
 
+func (apiCfg *apiConfig) handleGetFeeds(w http.ResponseWriter, r *http.Request) {
+
+	if feeds, err := apiCfg.DB.GetFeeds(r.Context()); err != nil {
+		responseWithError(w, 400, fmt.Sprintf("Couldn't get feeds from DB: %v", err))
+		return
+	} else {
+		responseWithJSON(w, 200, databaseFeedsToFeeds(feeds))
+	}
+}
+
 /*func (apiCfg *apiConfig) handleGetFeed(w http.ResponseWriter, r *http.Request) {
 	if apiKey, err := auth.GetAPIKey(r.Header); err != nil {
 		responseWithError(w, 403, fmt.Sprintf("Auth error: %v", err))
