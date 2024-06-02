@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/samezio/rrs_aggregator/internal/auth"
 	"github.com/samezio/rrs_aggregator/internal/database"
 )
 
@@ -32,12 +31,6 @@ func (apiCfg *apiConfig) handleCreateUser(w http.ResponseWriter, r *http.Request
 		responseWithJSON(w, 200, databaseUserToUser(user))
 	}
 }
-func (apiCfg *apiConfig) handleGetUser(w http.ResponseWriter, r *http.Request) {
-	if apiKey, err := auth.GetAPIKey(r.Header); err != nil {
-		responseWithError(w, 403, fmt.Sprintf("Auth error: %v", err))
-	} else if user, err := apiCfg.DB.GetUserByAPIKey(r.Context(), apiKey); err != nil {
-		responseWithError(w, 400, fmt.Sprintf("Unable to find user: %v", err))
-	} else {
-		responseWithJSON(w, 200, databaseUserToUser(user))
-	}
+func (apiCfg *apiConfig) handleGetUser(w http.ResponseWriter, r *http.Request, user database.User) {
+	responseWithJSON(w, 200, databaseUserToUser(user))
 }
