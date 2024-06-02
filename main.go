@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
@@ -65,12 +66,17 @@ func main() {
 	v1Router.Post("/feed_follows", apiCfg.middlewareAuth(apiCfg.handleCreateFeedFollow))
 	v1Router.Get("/feed_follows", apiCfg.middlewareAuth(apiCfg.handleGetFeedFollows))
 	v1Router.Delete("/feed_follows/{feedFollowID}", apiCfg.middlewareAuth(apiCfg.handleDeleteFeedFollows))
+
+	v1Router.Get("/posts", apiCfg.middlewareAuth(apiCfg.handleGetPostsForUser))
+
 	router.Mount("/v1", v1Router)
 
 	server := &http.Server{
 		Handler: router,
 		Addr:    fmt.Sprintf(":%d", port),
 	}
+
+	go startScraping(apiCfg.DB, 5, 10*time.Second)
 
 	log.Printf("Server starting at %s\n", fmt.Sprintf(":%d", port))
 	if err := server.ListenAndServe(); err != nil {
